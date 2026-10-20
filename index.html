@@ -37,6 +37,9 @@
     --glass-base-2:    rgba(255,255,255,.082);
     --glass-base-3:    rgba(255,255,255,.128);
 
+    /* FIX: --glass-border was referenced but never defined */
+    --glass-border:    rgba(255,255,255,.08);
+
     --glass-face:
       radial-gradient(56% 46% at 18% 8%, rgba(255,255,255,.22), transparent 62%),
       radial-gradient(140% 110% at 28% -14%, rgba(255,255,255,.10), transparent 55%),
@@ -128,6 +131,7 @@
     --glass-base-sub:  rgba(16,20,34,.028);
     --glass-base-2:    rgba(16,20,34,.060);
     --glass-base-3:    rgba(16,20,34,.098);
+    --glass-border:    rgba(16,20,34,.08);
 
     --glass-face:
       radial-gradient(56% 46% at 18% 8%, rgba(255,255,255,.78), transparent 62%),
@@ -777,9 +781,7 @@
 </head>
 <body>
 
-<!-- ============================================================
-     LIQUID GRADIENT MESH
-============================================================ -->
+<!-- Liquid gradient mesh -->
 <div class="bg-mesh" aria-hidden="true">
   <div class="blob b1"></div>
   <div class="blob b2"></div>
@@ -789,11 +791,7 @@
   <div class="blob b6"></div>
 </div>
 
-<!-- ============================================================
-     APP
-============================================================ -->
 <div class="app">
-
   <div class="topbar">
     <div class="brand">
       <div class="brand-mark">
@@ -819,7 +817,6 @@
     </div>
   </div>
 
-  <!-- Wallet view -->
   <section class="view active" id="view-wallet">
     <div class="balance-card">
       <div class="card-label">Total balance</div>
@@ -842,7 +839,6 @@
     <div id="txList"></div>
   </section>
 
-  <!-- Tasks view -->
   <section class="view" id="view-tasks">
     <div class="tasks-head">
       <h1>Tasks</h1>
@@ -868,7 +864,6 @@
   </section>
 </div>
 
-<!-- FAB -->
 <div class="fab-wrap" id="fabWrap">
   <button class="fab" id="fab" aria-label="Add transaction">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
@@ -877,7 +872,6 @@
   </button>
 </div>
 
-<!-- Tab bar -->
 <nav class="tabbar" id="tabbar" data-active="wallet">
   <div class="tab-pill" aria-hidden="true"></div>
   <button class="tab active" data-tab="wallet">
@@ -897,10 +891,8 @@
   </button>
 </nav>
 
-<!-- Backdrop -->
 <div class="backdrop" id="backdrop"></div>
 
-<!-- Transaction sheet -->
 <div class="sheet" id="txSheet">
   <div class="sheet-handle"></div>
   <div class="seg" id="typeSeg">
@@ -917,7 +909,6 @@
   <button class="primary-btn" id="saveTx">Add transaction</button>
 </div>
 
-<!-- Task sheet -->
 <div class="sheet" id="taskSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-title" id="taskSheetTitle">New task</div>
@@ -945,7 +936,6 @@
   <button class="ghost-danger" id="taskDelete" style="display:none">Delete task</button>
 </div>
 
-<!-- Settings sheet -->
 <div class="sheet" id="settingsSheet">
   <div class="sheet-handle"></div>
   <div class="sheet-title">Settings</div>
@@ -1294,8 +1284,41 @@ function checkOverdue(){
   if (changed) sessionStorage.setItem('pocket.notified', JSON.stringify(seen));
 }
 
+/* ---- UPDATED: GitHub Pages-safe service worker registration ----
+   - Registers after `load` so the SW never blocks first paint
+   - Uses a plain relative path ('sw.js') so it resolves correctly
+     under any subpath like /pocket-app/ on GitHub Pages
+   - Logs a friendly info message if sw.js isn't deployed yet
+     instead of throwing a console error                              */
 if ('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./sw.js').then(r => { swReg = r; }).catch(() => {});
+  window.addEventListener('load', () => {
+    let swUrl;
+    try {
+      swUrl = new URL('sw.js', window.location.href).href;
+    } catch(e){
+      swUrl = 'sw.js';
+    }
+    navigator.serviceWorker.register(swUrl)
+      .then(reg => {
+        swReg = reg;
+        // If a new SW takes over, refresh the page once
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          if (!newWorker) return;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'activated' && navigator.serviceWorker.controller){
+              // A new SW is active; a reload is optional, not forced
+              // location.reload();
+            }
+          });
+        });
+      })
+      .catch(err => {
+        // sw.js is optional — notifications still work via the Notification API
+        // when the tab is open. Log an info message, not an error.
+        console.info('[Pocket] Service worker not registered (optional). Deploy sw.js next to index.html if you want background notifications.', err && err.message ? err.message : err);
+      });
+  });
 }
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden){ checkOverdue(); scheduleReminders(); }
@@ -1616,7 +1639,7 @@ function quickAddTask(){
 }
 
 /* ============================================================
-   TASK SHEET (create / edit)
+   TASK SHEET
 ============================================================ */
 let editingTaskId = null;
 let taskPriority = 'med';
