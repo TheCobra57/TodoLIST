@@ -294,16 +294,6 @@
     backdrop-filter: blur(44px) saturate(220%) brightness(1.05);
   }
 
-  /* Task rows get an extra white base so they read as neutral white glass */
-  html[data-maxglass="true"] .slide.task-row{
-    background:
-      var(--pointer-light),
-      var(--glass-noise),
-      var(--glass-face),
-      rgba(255,255,255,.15),
-      var(--glass-base);
-  }
-
   html[data-maxglass="true"] .brand-mark,
   html[data-maxglass="true"] .quick-add,
   html[data-maxglass="true"] .tab-pill,
@@ -473,9 +463,6 @@
   .day-label{ font-size:11.5px; font-weight:600; letter-spacing:.7px; text-transform:uppercase; color:var(--muted); padding:14px 6px 8px; }
   .day-group:first-child .day-label{ padding-top:2px; }
 
-  /* ============================================================
-     SWIPE WRAP — transparent so nothing bleeds through the glass
-  ============================================================ */
   .swipe-wrap{
     position:relative; overflow:hidden; border-radius:18px;
     margin-bottom:8px;
@@ -485,13 +472,15 @@
   }
   .swipe-wrap.removing{ max-height:0; opacity:0; margin-bottom:0; }
 
-  /* Delete button is red but invisible until revealed by a swipe */
   .del-btn{
     position:absolute; top:0; right:0; bottom:0; width:88px;
-    border:0; background:var(--red); color:#fff;
+    border:0;
+    background:var(--surface2);
+    color:var(--text);
     font-size:13.5px; font-weight:600; letter-spacing:.2px;
     opacity:0; pointer-events:none;
     transition:opacity .12s ease;
+    border-left: 1px solid var(--glass-border);
   }
   .swipe-wrap.open .del-btn{
     opacity:1; pointer-events:auto;
@@ -566,7 +555,6 @@
   }
   .filter.active{ background:var(--glass-face-strong), var(--glass-base-3); color:var(--text); }
 
-  /* Task row — extra white base so it reads as white glass, not mesh-tinted */
   .slide.task-row{
     background:
       var(--glass-face),
@@ -1350,7 +1338,6 @@ function attachSwipe(wrap, onDelete){
 
     dx = Math.min(0, Math.max(x, -118));
     slide.style.transform = `translateX(${dx}px)`;
-    /* Fade the delete button in as we swipe */
     del.style.opacity = Math.min(1, Math.abs(dx) / 88).toFixed(2);
   });
 
