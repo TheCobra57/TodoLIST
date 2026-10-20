@@ -22,9 +22,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Pocket — Wallet & Tasks</title>
 <style>
-  /* ============================================================
-     1. THEME TOKENS
-  ============================================================ */
   :root{
     color-scheme: dark;
     --bg:#0a0b0f;
@@ -199,9 +196,6 @@
     --blob-6: rgba(255,130,155,.44);
   }
 
-  /* ============================================================
-     2. MAX LIQUID GLASS
-  ============================================================ */
   html[data-maxglass="true"]{
     --glass-base:     rgba(255,255,255,.032);
     --glass-base-sub: rgba(255,255,255,.024);
@@ -281,7 +275,6 @@
   html[data-maxglass="true"] .balance-card,
   html[data-maxglass="true"] .stat,
   html[data-maxglass="true"] .slide,
-  html[data-maxglass="true"] .task-row,
   html[data-maxglass="true"] .filter,
   html[data-maxglass="true"] .chip,
   html[data-maxglass="true"] .field,
@@ -299,6 +292,16 @@
       var(--glass-base);
     -webkit-backdrop-filter: blur(44px) saturate(220%) brightness(1.05);
     backdrop-filter: blur(44px) saturate(220%) brightness(1.05);
+  }
+
+  /* Task rows get an extra white base so they read as neutral white glass */
+  html[data-maxglass="true"] .slide.task-row{
+    background:
+      var(--pointer-light),
+      var(--glass-noise),
+      var(--glass-face),
+      rgba(255,255,255,.15),
+      var(--glass-base);
   }
 
   html[data-maxglass="true"] .brand-mark,
@@ -369,9 +372,6 @@
     50%    { box-shadow: var(--hi-2), 0 20px 40px -16px rgba(0,0,0,.75), 0 0 34px 2px rgba(124,108,255,.42); }
   }
 
-  /* ============================================================
-     3. RESET + BASE
-  ============================================================ */
   *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html,body{ margin:0; padding:0; }
   html{ background:var(--bg); }
@@ -385,13 +385,7 @@
   button{ font-family:inherit; cursor:pointer; }
   input{ font-family:inherit; }
 
-  /* ============================================================
-     4. LIQUID GRADIENT MESH
-  ============================================================ */
-  .bg-mesh{
-    position:fixed; inset:0; z-index:0; pointer-events:none;
-    overflow:hidden; contain:strict;
-  }
+  .bg-mesh{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; contain:strict; }
   .bg-mesh::before{
     content:''; position:absolute; inset:0;
     background:
@@ -421,9 +415,6 @@
     html[data-maxglass="true"] .fab{ animation:none !important; }
   }
 
-  /* ============================================================
-     5. LAYOUT
-  ============================================================ */
   .app{ position:relative; z-index:1; max-width:480px; margin:0 auto; padding:0 16px calc(146px + env(safe-area-inset-bottom)); }
   .view{ display:none; }
   .view.active{ display:block; animation:fadeUp .34s var(--ease); }
@@ -482,9 +473,30 @@
   .day-label{ font-size:11.5px; font-weight:600; letter-spacing:.7px; text-transform:uppercase; color:var(--muted); padding:14px 6px 8px; }
   .day-group:first-child .day-label{ padding-top:2px; }
 
-  .swipe-wrap{ position:relative; overflow:hidden; border-radius:18px; margin-bottom:8px; background:var(--red); transition:max-height .28s ease, opacity .22s ease, margin .28s ease; max-height:170px; }
+  /* ============================================================
+     SWIPE WRAP — transparent so nothing bleeds through the glass
+  ============================================================ */
+  .swipe-wrap{
+    position:relative; overflow:hidden; border-radius:18px;
+    margin-bottom:8px;
+    background:transparent;
+    transition:max-height .28s ease, opacity .22s ease, margin .28s ease;
+    max-height:170px;
+  }
   .swipe-wrap.removing{ max-height:0; opacity:0; margin-bottom:0; }
-  .del-btn{ position:absolute; top:0; right:0; bottom:0; width:88px; border:0; background:transparent; color:#fff; font-size:13.5px; font-weight:600; letter-spacing:.2px; }
+
+  /* Delete button is red but invisible until revealed by a swipe */
+  .del-btn{
+    position:absolute; top:0; right:0; bottom:0; width:88px;
+    border:0; background:var(--red); color:#fff;
+    font-size:13.5px; font-weight:600; letter-spacing:.2px;
+    opacity:0; pointer-events:none;
+    transition:opacity .12s ease;
+  }
+  .swipe-wrap.open .del-btn{
+    opacity:1; pointer-events:auto;
+  }
+
   .slide{
     position:relative; display:flex; align-items:center; gap:12px; padding:12px;
     background:var(--glass-face), var(--glass-base);
@@ -553,9 +565,17 @@
     -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
   }
   .filter.active{ background:var(--glass-face-strong), var(--glass-base-3); color:var(--text); }
+
+  /* Task row — extra white base so it reads as white glass, not mesh-tinted */
+  .slide.task-row{
+    background:
+      var(--glass-face),
+      rgba(255,255,255,.15),
+      var(--glass-base);
+  }
+
   .task-row{
     position:relative; display:flex; align-items:center; gap:13px; padding:13px;
-    background:var(--glass-face), var(--glass-base);
     box-shadow:var(--hi-1);
     border-radius:18px; touch-action:pan-y; will-change:transform;
     -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
@@ -575,19 +595,10 @@
   .task-row.done .task-text{ color:var(--input-ph); text-decoration:line-through; text-decoration-color:var(--checkbox-border); }
   .task-row.done .task-meta{ opacity:.55; }
 
-  /* Priority shown as a border on the row instead of a colored dot */
-  .task-row.prio-high{
-    border: 2.5px solid var(--red);
-    box-shadow: var(--hi-1), 0 0 20px -6px rgba(255,107,133,.5);
-  }
-  .task-row.prio-med{
-    border: 2px solid var(--amber);
-    box-shadow: var(--hi-1), 0 0 16px -6px rgba(240,180,90,.4);
-  }
-  /* Low priority: standard glass, no extra border */
-
+  .task-row.prio-high{ border: 2.5px solid var(--red); }
+  .task-row.prio-med{ border: 2px solid var(--amber); }
   .task-row.done.prio-high{ border-color: rgba(255,107,133,.42); }
-  .task-row.done.prio-med{  border-color: rgba(240,180,90,.42); }
+  .task-row.done.prio-med{ border-color: rgba(240,180,90,.42); }
 
   .task-meta{ display:flex; flex-wrap:wrap; gap:4px 10px; }
   .meta-item{ font-size:11.5px; color:var(--muted); font-weight:550; display:inline-flex; align-items:center; gap:3px; white-space:nowrap; }
@@ -975,9 +986,6 @@
 </div>
 
 <script>
-/* ============================================================
-   CONSTANTS
-============================================================ */
 const CURRENCY = '$';
 const KEY = 'pocket.v1';
 const THEME_KEY = 'pocket.theme';
@@ -1021,9 +1029,6 @@ const NOTIF_ICON = "data:image/svg+xml," + encodeURIComponent(
   "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='#1b1d26'/><text x='32' y='45' font-size='36' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='#fff'>P</text></svg>"
 );
 
-/* ============================================================
-   HELPERS
-============================================================ */
 const $  = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
@@ -1072,9 +1077,6 @@ function toLocalInput(iso){
   return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
-/* ============================================================
-   STATE
-============================================================ */
 let state = load();
 function load(){
   try {
@@ -1097,9 +1099,6 @@ function load(){
 }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
 
-/* ============================================================
-   THEME
-============================================================ */
 const mqLight = window.matchMedia('(prefers-color-scheme: light)');
 let themePref = localStorage.getItem(THEME_KEY) || 'system';
 if (!THEME_ORDER.includes(themePref)) themePref = 'system';
@@ -1127,9 +1126,6 @@ function setTheme(p){
 }
 mqLight.addEventListener?.('change', () => { if (themePref === 'system') applyTheme(); });
 
-/* ============================================================
-   MAX GLASS TOGGLE
-============================================================ */
 function getMaxGlass(){
   const v = localStorage.getItem(MAXGLASS_KEY);
   return v === null ? true : v === 'true';
@@ -1150,9 +1146,6 @@ function initMaxGlass(){
   }
 }
 
-/* ============================================================
-   POINTER LIGHT
-============================================================ */
 function initPointerLight(){
   let pending = false;
   let px = window.innerWidth * 0.3;
@@ -1178,9 +1171,6 @@ function initPointerLight(){
   apply();
 }
 
-/* ============================================================
-   NOTIFICATIONS
-============================================================ */
 let swReg = null;
 const reminderTimers = new Map();
 function notifSupported(){ return 'Notification' in window; }
@@ -1233,20 +1223,15 @@ function scheduleReminders(){
   reminderTimers.forEach(t => clearTimeout(t));
   reminderTimers.clear();
   if (!notifSupported() || Notification.permission !== 'granted') return;
-
   const now = Date.now();
   const horizon = 24 * 3600 * 1000;
-
   state.tasks.forEach(t => {
     if (t.done) return;
     if (t.start){
       const s = new Date(t.start).getTime();
       if (!isNaN(s) && s > now && s - now < horizon){
         const key = t.id + ':start';
-        const timer = setTimeout(() => {
-          showNotif('▶️ Starting now', t.text);
-          reminderTimers.delete(key);
-        }, s - now);
+        const timer = setTimeout(() => { showNotif('▶️ Starting now', t.text); reminderTimers.delete(key); }, s - now);
         reminderTimers.set(key, timer);
       }
     }
@@ -1254,10 +1239,7 @@ function scheduleReminders(){
       const e = new Date(t.end).getTime();
       if (!isNaN(e) && e > now && e - now < horizon){
         const key = t.id + ':end';
-        const timer = setTimeout(() => {
-          showNotif('⏰ Task due', t.text);
-          reminderTimers.delete(key);
-        }, e - now);
+        const timer = setTimeout(() => { showNotif('⏰ Task due', t.text); reminderTimers.delete(key); }, e - now);
         reminderTimers.set(key, timer);
       }
     }
@@ -1286,11 +1268,7 @@ function checkOverdue(){
 if ('serviceWorker' in navigator){
   window.addEventListener('load', () => {
     let swUrl;
-    try {
-      swUrl = new URL('sw.js', window.location.href).href;
-    } catch(e){
-      swUrl = 'sw.js';
-    }
+    try { swUrl = new URL('sw.js', window.location.href).href; } catch(e){ swUrl = 'sw.js'; }
     navigator.serviceWorker.register(swUrl)
       .then(reg => { swReg = reg; })
       .catch(err => {
@@ -1302,9 +1280,6 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden){ checkOverdue(); scheduleReminders(); }
 });
 
-/* ============================================================
-   SHEETS
-============================================================ */
 const backdrop = $('#backdrop');
 let activeSheet = null;
 
@@ -1323,11 +1298,7 @@ function closeSheetEl(){
 }
 backdrop.addEventListener('click', closeSheetEl);
 
-/* ============================================================
-   SWIPE-TO-DELETE
-============================================================ */
 let openWrap = null;
-
 function closeOpen(){
   if (openWrap){
     const w = openWrap;
@@ -1346,6 +1317,7 @@ function attachSwipe(wrap, onDelete){
     slide.style.transition = animate ? 'transform .3s cubic-bezier(.22,1,.36,1)' : 'none';
     slide.style.transform = 'translateX(0)';
     wrap.classList.remove('open');
+    del.style.opacity = '0';
     if (openWrap === wrap) openWrap = null;
   };
   wrap._close = close;
@@ -1378,6 +1350,8 @@ function attachSwipe(wrap, onDelete){
 
     dx = Math.min(0, Math.max(x, -118));
     slide.style.transform = `translateX(${dx}px)`;
+    /* Fade the delete button in as we swipe */
+    del.style.opacity = Math.min(1, Math.abs(dx) / 88).toFixed(2);
   });
 
   const finish = (e) => {
@@ -1400,6 +1374,7 @@ function attachSwipe(wrap, onDelete){
       slide.style.transform = 'translateX(-88px)';
       wrap.classList.add('open');
       openWrap = wrap;
+      del.style.opacity = '1';
     } else {
       close();
     }
@@ -1410,6 +1385,7 @@ function attachSwipe(wrap, onDelete){
 
   del.addEventListener('click', e => {
     e.stopPropagation();
+    if (!wrap.classList.contains('open')) return;
     onDelete(wrap);
   });
 }
@@ -1418,9 +1394,6 @@ document.addEventListener('pointerdown', e => {
   if (openWrap && !openWrap.contains(e.target)) closeOpen();
 }, true);
 
-/* ============================================================
-   WALLET RENDERING
-============================================================ */
 function renderWallet(){
   const txs = state.transactions;
   const bal = txs.reduce((s, t) => s + (t.type === 'in' ? t.amount : -t.amount), 0);
@@ -1490,9 +1463,6 @@ function deleteTx(id, wrap){
   }, 230);
 }
 
-/* ============================================================
-   TASKS RENDERING
-============================================================ */
 function taskTime(t){
   if (t.start) { const v = new Date(t.start).getTime(); if (!isNaN(v)) return v; }
   if (t.end) { const v = new Date(t.end).getTime(); if (!isNaN(v)) return v; }
@@ -1616,9 +1586,6 @@ function quickAddTask(){
   input.focus();
 }
 
-/* ============================================================
-   TASK SHEET
-============================================================ */
 let editingTaskId = null;
 let taskPriority = 'med';
 
@@ -1706,9 +1673,6 @@ function deleteEditingTask(){
   scheduleReminders();
 }
 
-/* ============================================================
-   TRANSACTION SHEET
-============================================================ */
 let sheetType = 'out';
 let sheetCat = CATS.out[0];
 
@@ -1772,9 +1736,6 @@ function saveTransaction(){
   renderWallet();
 }
 
-/* ============================================================
-   TABS
-============================================================ */
 const tabbar = $('#tabbar');
 
 function setTab(tab){
@@ -1793,9 +1754,6 @@ function setTab(tab){
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* ============================================================
-   INIT
-============================================================ */
 function init(){
   applyTheme();
   initMaxGlass();
