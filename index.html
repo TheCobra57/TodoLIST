@@ -37,7 +37,6 @@
     --glass-base-2:    rgba(255,255,255,.082);
     --glass-base-3:    rgba(255,255,255,.128);
 
-    /* FIX: --glass-border was referenced but never defined */
     --glass-border:    rgba(255,255,255,.08);
 
     --glass-face:
@@ -201,7 +200,7 @@
   }
 
   /* ============================================================
-     2. MAX LIQUID GLASS — gated on [data-maxglass="true"]
+     2. MAX LIQUID GLASS
   ============================================================ */
   html[data-maxglass="true"]{
     --glass-base:     rgba(255,255,255,.032);
@@ -279,7 +278,6 @@
     --blob-6: rgba(255,130,155,.52);
   }
 
-  /* Apply enhanced glass to surfaces when max is on */
   html[data-maxglass="true"] .balance-card,
   html[data-maxglass="true"] .stat,
   html[data-maxglass="true"] .slide,
@@ -431,7 +429,6 @@
   .view.active{ display:block; animation:fadeUp .34s var(--ease); }
   @keyframes fadeUp{ from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
 
-  /* Top bar */
   .topbar{ display:flex; align-items:center; justify-content:space-between; padding:calc(20px + env(safe-area-inset-top)) 4px 18px; }
   .brand{ display:flex; align-items:center; gap:11px; }
   .brand-mark{
@@ -458,7 +455,6 @@
   .icon-btn:active{ transform:scale(.94); }
   .icon-btn svg{ width:17px; height:17px; }
 
-  /* Balance card */
   .balance-card{
     position:relative; overflow:hidden; border-radius:28px; padding:22px 20px 18px;
     background:var(--glass-face), var(--glass-base);
@@ -486,7 +482,6 @@
   .day-label{ font-size:11.5px; font-weight:600; letter-spacing:.7px; text-transform:uppercase; color:var(--muted); padding:14px 6px 8px; }
   .day-group:first-child .day-label{ padding-top:2px; }
 
-  /* Swipe rows */
   .swipe-wrap{ position:relative; overflow:hidden; border-radius:18px; margin-bottom:8px; background:var(--red); transition:max-height .28s ease, opacity .22s ease, margin .28s ease; max-height:170px; }
   .swipe-wrap.removing{ max-height:0; opacity:0; margin-bottom:0; }
   .del-btn{ position:absolute; top:0; right:0; bottom:0; width:88px; border:0; background:transparent; color:#fff; font-size:13.5px; font-weight:600; letter-spacing:.2px; }
@@ -507,13 +502,11 @@
   .tx-amt.in{ color:var(--green); }
   .tx-amt.out{ color:var(--tx-out); }
 
-  /* Empty state */
   .empty{ text-align:center; padding:46px 20px; background:var(--glass-face-sub), var(--glass-base-sub); border:1px dashed var(--empty-border); border-radius:22px; margin-top:4px; transition:border-color .4s, background .4s; }
   .empty-icon{ font-size:30px; margin-bottom:10px; opacity:.85; }
   .empty p{ margin:0 0 5px; font-size:14.5px; font-weight:600; }
   .empty span{ font-size:12.5px; color:var(--muted); }
 
-  /* Tasks */
   .tasks-head{ display:flex; align-items:flex-end; justify-content:space-between; padding:6px 4px 14px; }
   .tasks-head h1{ font-size:27px; font-weight:700; margin:0; letter-spacing:-.9px; }
   .tasks-head .count{ font-size:12.5px; color:var(--muted); font-weight:550; padding-bottom:5px; }
@@ -566,7 +559,7 @@
     box-shadow:var(--hi-1);
     border-radius:18px; touch-action:pan-y; will-change:transform;
     -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
-    transition:background .4s;
+    transition:background .4s, border-color .3s, box-shadow .3s;
   }
   .checkbox{
     width:23px; height:23px; flex:0 0 23px; border-radius:50%;
@@ -581,14 +574,25 @@
   .task-text{ font-size:15px; font-weight:500; letter-spacing:-.1px; line-height:1.35; transition:color .22s; word-break:break-word; }
   .task-row.done .task-text{ color:var(--input-ph); text-decoration:line-through; text-decoration-color:var(--checkbox-border); }
   .task-row.done .task-meta{ opacity:.55; }
+
+  /* Priority shown as a border on the row instead of a colored dot */
+  .task-row.prio-high{
+    border: 2.5px solid var(--red);
+    box-shadow: var(--hi-1), 0 0 20px -6px rgba(255,107,133,.5);
+  }
+  .task-row.prio-med{
+    border: 2px solid var(--amber);
+    box-shadow: var(--hi-1), 0 0 16px -6px rgba(240,180,90,.4);
+  }
+  /* Low priority: standard glass, no extra border */
+
+  .task-row.done.prio-high{ border-color: rgba(255,107,133,.42); }
+  .task-row.done.prio-med{  border-color: rgba(240,180,90,.42); }
+
   .task-meta{ display:flex; flex-wrap:wrap; gap:4px 10px; }
   .meta-item{ font-size:11.5px; color:var(--muted); font-weight:550; display:inline-flex; align-items:center; gap:3px; white-space:nowrap; }
   .meta-item.overdue{ color:var(--red); font-weight:600; }
-  .meta-item.prio-low{ color:var(--green); }
-  .meta-item.prio-med{ color:var(--amber); }
-  .meta-item.prio-high{ color:var(--red); }
 
-  /* Tab bar */
   .tabbar{
     position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom)); transform:translateX(-50%);
     z-index:20; width:calc(100% - 56px); max-width:268px; display:flex; gap:4px; padding:6px; border-radius:32px;
@@ -617,7 +621,6 @@
   .tab.active svg{ transform:scale(1.08); }
   .tab:active svg{ transform:scale(.85); }
 
-  /* FAB */
   .fab-wrap{ position:fixed; left:0; right:0; z-index:15; bottom:calc(104px + env(safe-area-inset-bottom)); max-width:480px; margin:0 auto; padding:0 22px; display:flex; justify-content:flex-end; pointer-events:none; transition:opacity .3s var(--ease), transform .3s var(--ease); }
   .fab-wrap.hide{ opacity:0; transform:translateY(18px) scale(.85); }
   .fab{
@@ -633,7 +636,6 @@
   .fab:active{ transform:scale(.9); }
   .fab svg{ width:25px; height:25px; position:relative; z-index:2; }
 
-  /* Conic rim reflection */
   .brand-mark::before,
   .tab-pill::before,
   .fab::before,
@@ -648,7 +650,6 @@
     pointer-events:none; z-index:1;
   }
 
-  /* Sheets */
   .backdrop{ position:fixed; inset:0; z-index:30; background:rgba(0,0,0,.5); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); opacity:0; pointer-events:none; transition:opacity .3s ease; }
   .backdrop.show{ opacity:1; pointer-events:auto; }
   .sheet{
@@ -743,7 +744,6 @@
   .setting-note{ font-size:11.5px; color:var(--muted); line-height:1.5; margin:8px 0 0; }
   #resetBtn{ margin-top:16px; }
 
-  /* Toggle row */
   .toggle-row{
     display:flex; align-items:center; justify-content:space-between; gap:14px;
     padding:12px 14px; border-radius:15px;
@@ -781,7 +781,6 @@
 </head>
 <body>
 
-<!-- Liquid gradient mesh -->
 <div class="bg-mesh" aria-hidden="true">
   <div class="blob b1"></div>
   <div class="blob b2"></div>
@@ -1284,12 +1283,6 @@ function checkOverdue(){
   if (changed) sessionStorage.setItem('pocket.notified', JSON.stringify(seen));
 }
 
-/* ---- UPDATED: GitHub Pages-safe service worker registration ----
-   - Registers after `load` so the SW never blocks first paint
-   - Uses a plain relative path ('sw.js') so it resolves correctly
-     under any subpath like /pocket-app/ on GitHub Pages
-   - Logs a friendly info message if sw.js isn't deployed yet
-     instead of throwing a console error                              */
 if ('serviceWorker' in navigator){
   window.addEventListener('load', () => {
     let swUrl;
@@ -1299,23 +1292,8 @@ if ('serviceWorker' in navigator){
       swUrl = 'sw.js';
     }
     navigator.serviceWorker.register(swUrl)
-      .then(reg => {
-        swReg = reg;
-        // If a new SW takes over, refresh the page once
-        reg.addEventListener('updatefound', () => {
-          const newWorker = reg.installing;
-          if (!newWorker) return;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'activated' && navigator.serviceWorker.controller){
-              // A new SW is active; a reload is optional, not forced
-              // location.reload();
-            }
-          });
-        });
-      })
+      .then(reg => { swReg = reg; })
       .catch(err => {
-        // sw.js is optional — notifications still work via the Notification API
-        // when the tab is open. Log an info message, not an error.
         console.info('[Pocket] Service worker not registered (optional). Deploy sw.js next to index.html if you want background notifications.', err && err.message ? err.message : err);
       });
   });
@@ -1556,12 +1534,12 @@ function renderTasks(){
     const when = fmtRange(t.start, t.end);
     if (when) meta.push(`<span class="meta-item${overdue ? ' overdue' : ''}">${overdue ? '⚠️' : '🕐'} ${esc(when)}</span>`);
     if (t.place) meta.push(`<span class="meta-item">📍 ${esc(t.place)}</span>`);
-    if (t.priority) meta.push(`<span class="meta-item prio-${t.priority}">● ${PRIO_LABEL[t.priority]}</span>`);
+    if (t.priority) meta.push(`<span class="meta-item">${PRIO_LABEL[t.priority]}</span>`);
 
     return `
       <div class="swipe-wrap" data-wrap="${t.id}">
         <button class="del-btn">Delete</button>
-        <div class="slide task-row ${t.done ? 'done' : ''}" data-id="${t.id}">
+        <div class="slide task-row ${t.done ? 'done' : ''}${t.priority ? ' prio-' + t.priority : ''}" data-id="${t.id}">
           <button class="checkbox ${t.done ? 'checked' : ''}" data-check="${t.id}" aria-label="Toggle task">
             <svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg>
           </button>
